@@ -203,7 +203,7 @@ app.get('/', (req, res) => {
 });
 
 // ── Démarrage du serveur ──
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`SuperMarché CM SMS Backend démarré sur le port ${PORT}`);
   console.log(`Mode : ${process.env.AT_USERNAME === 'sandbox' ? 'SANDBOX (test)' : 'PRODUCTION'}`);
