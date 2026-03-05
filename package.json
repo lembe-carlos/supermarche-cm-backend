@@ -1,0 +1,14 @@
+{
+  "name": "supermarche-cm-sms",
+  "version": "1.0.0",
+  "description": "Backend SMS pour SuperMarché CM",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "africastalking": "^0.4.4",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
