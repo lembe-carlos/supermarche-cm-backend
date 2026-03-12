@@ -128,7 +128,7 @@ app.get('/', (req, res) => {
   res.json({
     status: 'SuperMarché CM Backend opérationnel',
     version: '2.0.0',
-    ia: 'Google Gemini 1.5 Flash',
+    ia: 'Google Gemini 2.0 Flash',
     routes: ['POST /sms/commande', 'POST /sms/livraison', 'POST /sms/livree', 'POST /sms/annulation', 'POST /sms/custom', 'POST /ia/chat']
   });
 });
