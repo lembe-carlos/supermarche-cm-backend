@@ -98,7 +98,7 @@ app.post('/ia/chat', async (req, res) => {
     });
  
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -128,7 +128,7 @@ app.get('/', (req, res) => {
   res.json({
     status: 'SuperMarché CM Backend opérationnel',
     version: '2.0.0',
-   https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}
+    ia: 'Google Gemini 2.0 Flash',
     routes: ['POST /sms/commande', 'POST /sms/livraison', 'POST /sms/livree', 'POST /sms/annulation', 'POST /sms/custom', 'POST /ia/chat']
   });
 });
@@ -138,3 +138,4 @@ app.listen(PORT, () => {
   console.log(`SuperMarché CM Backend démarré sur le port ${PORT}`);
   console.log(`Mode : ${process.env.AT_USERNAME === 'sandbox' ? 'SANDBOX (test)' : 'PRODUCTION'}`);
 });
+ 
