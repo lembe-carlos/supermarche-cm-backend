@@ -186,7 +186,45 @@ app.post('/sms/custom', async (req, res) => {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
+// ════════════════════════════════════════
+//  ROUTE IA — Assistant Claude
+// ════════════════════════════════════════
+const Anthropic = require('@anthropic-ai/sdk');
 
+app.post('/ia/chat', async (req, res) => {
+  try {
+    const { messages, context } = req.body;
+    if (!messages || messages.length === 0) {
+      return res.status(400).json({ ok: false, error: 'Messages requis' });
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ ok: false, error: 'Clé Anthropic non configurée' });
+    }
+
+    const client = new Anthropic({ apiKey });
+
+    const systemPrompt = `Tu es l'assistant IA de SuperMarché CM, une application de gestion de supermarché au Cameroun. 
+Tu aides le gérant à analyser ses données, optimiser ses ventes et prendre de bonnes décisions.
+Contexte actuel de l'application : ${context ? JSON.stringify(context) : 'Non disponible'}
+Réponds toujours en français, de manière concise et pratique.`;
+
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: messages
+    });
+
+    const reply = response.content[0].text;
+    res.json({ ok: true, reply });
+
+  } catch (err) {
+    console.error('Erreur IA:', err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
 // ── Route de test ──
 app.get('/', (req, res) => {
   res.json({
