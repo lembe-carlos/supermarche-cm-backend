@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════
-//  SuperMarché CM — Backend SMS + IA Gemini
+//  SuperMarché CM — Backend SMS + IA Claude
 // ═══════════════════════════════════════════════════════════
  
 const express = require('express');
@@ -74,7 +74,7 @@ app.post('/sms/custom', async (req, res) => {
 });
  
 // ════════════════════════════════════════
-//  ROUTE IA — Google Gemini
+//  ROUTE IA — Claude (Anthropic)
 // ════════════════════════════════════════
 app.post('/ia/chat', async (req, res) => {
   try {
@@ -83,39 +83,34 @@ app.post('/ia/chat', async (req, res) => {
       return res.status(400).json({ ok: false, error: 'Messages requis' });
     }
  
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ ok: false, error: 'Clé Gemini non configurée' });
+      return res.status(500).json({ ok: false, error: 'Clé Anthropic non configurée' });
     }
  
     const systemPrompt = `Tu es l'assistant IA de SuperMarché CM, une application de gestion de supermarché au Cameroun. Tu aides le gérant à analyser ses données, optimiser ses ventes et prendre de bonnes décisions. Contexte : ${context ? JSON.stringify(context) : 'Non disponible'}. Réponds toujours en français, de manière concise et pratique.`;
  
-    const contents = messages.map(function(m) {
-      return {
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }]
-      };
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: messages
+      })
     });
- 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: contents,
-          generationConfig: { maxOutputTokens: 1024, temperature: 0.7 }
-        })
-      }
-    );
  
     const data = await response.json();
     if (!response.ok) {
-      return res.status(500).json({ ok: false, error: data.error?.message || 'Erreur Gemini' });
+      return res.status(500).json({ ok: false, error: data.error?.message || 'Erreur Anthropic' });
     }
  
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Pas de réponse';
+    const reply = data.content[0].text;
     res.json({ ok: true, reply });
  
   } catch (err) {
@@ -127,8 +122,8 @@ app.post('/ia/chat', async (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     status: 'SuperMarché CM Backend opérationnel',
-    version: '2.0.0',
-    ia: 'Google Gemini 2.0 Flash',
+    version: '3.0.0',
+    ia: 'Claude Haiku (Anthropic)',
     routes: ['POST /sms/commande', 'POST /sms/livraison', 'POST /sms/livree', 'POST /sms/annulation', 'POST /sms/custom', 'POST /ia/chat']
   });
 });
